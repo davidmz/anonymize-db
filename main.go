@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,9 +15,8 @@ import (
 
 var (
 	log    = debug.NewLogger("anon", debug.WithOutput(os.Stderr))
-	rules  Rules
-	input  io.Reader
-	output io.Writer
+	config *Config
+	output *os.File
 )
 
 func main() {
@@ -32,7 +30,7 @@ func main() {
 		inFile    string
 		outFile   string
 	)
-	flag.StringVarP(&rulesFile, "rules", "r", "", "rules file name (JSON)")
+	flag.StringVarP(&rulesFile, "config", "c", "", "config file name (JSON)")
 	flag.StringVarP(&inFile, "input", "i", "", "input file name (STDIN by default)")
 	flag.StringVarP(&outFile, "output", "o", "", "output file name (STDOUT by default)")
 	flag.Parse()
@@ -44,14 +42,14 @@ func main() {
 	}
 
 	log.Println("Loading rules from", rulesFile)
-	rules = loadRules(rulesFile)
+	config = loadConfig(rulesFile)
 
-	input = os.Stdin
+	input := os.Stdin
 	if inFile != "" {
 		mustbeDone(func() {
 			input = mustbe.OKVal(os.Open(inFile)).(*os.File)
 		}, "cannot open input file %s: %w", inFile)
-		defer input.(*os.File).Close()
+		defer input.Close()
 	}
 
 	output = os.Stdout
@@ -59,7 +57,7 @@ func main() {
 		mustbeDone(func() {
 			output = mustbe.OKVal(os.Create(outFile)).(*os.File)
 		}, "cannot create output file %s: %w", outFile)
-		defer output.(*os.File).Close()
+		defer output.Close()
 	}
 
 	log.Println("Start reading input")
@@ -74,14 +72,6 @@ func main() {
 		}
 	}
 	mustbe.OK(scanner.Err())
-
-	if s, ok := output.(Syncer); ok {
-		mustbe.OK(s.Sync())
-	}
-
+	mustbe.OK(output.Sync())
 	log.Println("All done.")
-}
-
-type Syncer interface {
-	Sync() error
 }

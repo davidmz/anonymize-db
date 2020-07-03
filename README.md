@@ -9,7 +9,7 @@ following way:
  * Some (configurable) tables are keeping untouched.
  * Some (configurable) tables are cleaning up and becoming empty.
  * In all other tables:
-    * All UUIDs are irreversibly encrypting. They remain correct
+    * Some or all (configurable) UUIDs are irreversibly encrypting. They remain correct
     UUIDs, however it is impossible to restore the original UUIDs back.
     * Some (configurable) column values are replacing by lorem ipsum-like content.
     This applies to texts, names, emails etc. There a several rules for different 
@@ -28,34 +28,41 @@ go get github.com/davidmz/anonymize-db
 
 ```
 Flags of anonymize-db:
+  -c, --config string   config file name (JSON)
   -i, --input string    input file name (STDIN by default)
   -o, --output string   output file name (STDOUT by default)
-  -r, --rules string    rules file name (JSON)
 ```
 
-The only required option is the path to [rules.json](./rules.json) file.
-This file contains specific anonymizing rules for different database tables.
+The only required option is the path to config file. This file contains specific anonymizing rules
+for different database tables. There are two predefined configuration files in this repository:
+
+  * [config.anon.json](./config.anon.json) — fully anonymizes database with all UUIDs and user data;
+  * [config.candy.json](./config.candy.json) — anonymizes database for the stage server
+    (candy.freefeed.net): usernames, hashed passwords and UUIDs are not changes (so users 
+    can sign in with their freefeed credentials), but all texts and attachments are anonymizes;
 
 The simplest usage is:
 
 ```
-pg_dump -d freefeed -U freefeed -F p | anonymize-db -r rules.json > anonymized.sql
+pg_dump -d freefeed -U freefeed -F p | anonymize-db -c config.anon.json > anonymized.sql
 ```
 
 ## Configure
 
-The [rules.json](./rules.json) file contains specific anonymizing rules for 
-different database tables. The file contains a mapping between the full-qualified 
-table names (including schema names, like "public.users") and instructions.
+The config file contains specific anonymizing rules for different database tables. The file contains
+a mapping between the full-qualified table names (including schema names, like "public.users") and
+instructions.
 
-The `{ "action": "KEEP" }` instruction means that the table must be keeping untouched.
+The top-level `encryptUUIDs` boolean value defines whether the all database UUIDs should be encrypted.
 
-The `{ "action": "CLEAN" }` instruction means that the table must be truncated and 
+The `{ "keep": true }` per-table instruction means that the table must be keeping untouched.
+
+The `{ "clean": true }` per-table instruction means that the table must be truncated and 
 become empty.
 
-The `{ "columns": {...} }` instruction deifies per-column anonymizing rules. Any column
+The `{ "columns": {...} }` per-table instruction defines the per-column anonymizing rules. Any column
 that are not listed here (and any tables that are not listed in the file) will be
-processed in general way: only the UUIDs will be encrypted.
+processed in general way: only the UUIDs will be encrypted if the top-level `encryptUUIDs` is true.
 
 The per-column rules are:
 
@@ -64,6 +71,7 @@ The per-column rules are:
 * `uniqword` — unique words like usernames (the same username always converted
   to the same word);
 * `uniqemail` — unique email addresses;
+* `uuids` — encrypt any UUIDs in column (if the global `encryptUUIDs` parameter isn't set);
 * `set:VALUE` — constant value to write to the column.
 
 The `set:` value format is the same as the 
@@ -72,13 +80,17 @@ so to set a NULL value use `set:\N` rule (and add the second backslash for JSON)
 
 Only non-NULL and non-empty columns processed.
 
-### Provided configuration
+### Provided configurations
 
-The provided [rules.json](./rules.json) is compatible with FreeFeed DB scheme with 
+The provided configs are compatible with FreeFeed DB scheme with 
 the last migration `20200422122956_multi_homefeeds.js`.
 
-The `hashed_password` value in the `public.users` table is a hashed 'tester' string 
-(so all users in resulted database will have the same 'tester' password).
+The `hashed_password` value in the `public.users` table ([config.anon.json](./config.anon.json)) is
+a hashed 'tester' string (so all users in resulted database will have the same 'tester' password).
+
+Both configs are cleans up the posts and comments `body_tsvector` fields. You must rebuild the
+search index after the anonymization if you want to use search.
+
 
 ## Debug
 

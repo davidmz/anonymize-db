@@ -1,0 +1,100 @@
+{
+    "encryptUUIDs": true,
+    "tables": {
+        "public.knex_migrations": {
+            "keep": true
+        },
+        "public.knex_migrations_lock": {
+            "keep": true
+        },
+        "public.app_tokens": {
+            "clean": true
+        },
+        "public.app_tokens_log": {
+            "clean": true
+        },
+        "public.archive_post_names": {
+            "clean": true
+        },
+        "public.archive_posts_via": {
+            "clean": true
+        },
+        "public.archive_shortener": {
+            "clean": true
+        },
+        "public.archive_via": {
+            "clean": true
+        },
+        "public.archives": {
+            "clean": true
+        },
+        "public.attachments": {
+            "columns": {
+                "file_name": "shorttext",
+                "artist": "shorttext",
+                "title": "shorttext"
+            }
+        },
+        "public.comments": {
+            "columns": {
+                "body": "text",
+                "body_tsvector": "set:\\N"
+            }
+        },
+        "public.external_auth": {
+            "columns": {
+                "external_id": "uniqword",
+                "title": "text"
+            }
+        },
+        "public.feeds": {
+            "columns": {
+                "title": "text"
+            }
+        },
+        "public.hashtags": {
+            "columns": {
+                "name": "uniqword"
+            }
+        },
+        "public.hidden_comments": {
+            "clean": true
+        },
+        "public.hidden_likes": {
+            "clean": true
+        },
+        "public.invitations": {
+            "clean": true
+        },
+        "public.posts": {
+            "columns": {
+                "body": "text",
+                "body_tsvector": "set:\\N"
+            }
+        },
+        "public.sent_emails_log": {
+            "clean": true
+        },
+        "public.stats": {
+            "clean": true
+        },
+        "public.user_past_names": {
+            "clean": true
+        },
+        "public.users": {
+            "columns": {
+                "username": "uniqword",
+                "screen_name": "shorttext",
+                "description": "text",
+                "email": "uniqemail",
+                "hashed_password": "set:$2b$10$iEszh03RllmR57lCPVw84.ApRBtl6DKtISe0QV8.fj90XyOSqid1u",
+                "reset_password_token": "set:\\N",
+                "reset_password_sent_at": "set:\\N",
+                "reset_password_expires_at": "set:\\N",
+                "frontend_preferences": "set:\\N",
+                "private_meta": "set:\\N",
+                "preferences": "set:{}"
+            }
+        }
+    }
+}

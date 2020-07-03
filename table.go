@@ -24,8 +24,9 @@ func processTable(headerLine string, scanner *bufio.Scanner) {
 	columns := strings.Split(header[2], ", ")
 	log.Println("Table found:", table, columns)
 
+	tableCfg := config.Tables[table]
 	colRules := make([]string, len(columns))
-	for colName, rule := range rules[table].Columns {
+	for colName, rule := range tableCfg.Columns {
 		for i, c := range columns {
 			if c == colName {
 				colRules[i] = rule
@@ -34,8 +35,8 @@ func processTable(headerLine string, scanner *bufio.Scanner) {
 		}
 	}
 
-	switch rules[table].Action {
-	case "KEEP":
+	switch {
+	case tableCfg.Keep:
 		log.Println("Keep this table")
 		for scanner.Scan() {
 			line := scanner.Text()
@@ -45,7 +46,7 @@ func processTable(headerLine string, scanner *bufio.Scanner) {
 			}
 		}
 		mustbe.OK(scanner.Err())
-	case "CLEAN":
+	case tableCfg.Clean:
 		log.Println("Clean this table")
 		for scanner.Scan() {
 			line := scanner.Text()
@@ -64,25 +65,27 @@ func processTable(headerLine string, scanner *bufio.Scanner) {
 				return
 			}
 
-			// Anonymize all UUIDs in the line
-			line = anonUUIDs(line)
-			if len(rules[table].Columns) > 0 {
+			if config.EncryptUUIDs {
+				// Anonymize all UUIDs in the line
+				line = anonAllUUIDs(line)
+			}
+			if len(config.Tables[table].Columns) > 0 {
 				values := strings.Split(line, "\t")
 				for i, rule := range colRules {
 					if values[i] != "" && values[i] != NULL {
-						switch rule {
-						case "shorttext":
+						switch {
+						case rule == "shorttext":
 							values[i] = strings.TrimSuffix(lorem.Sentence(1, 3), ".")
-						case "text":
+						case rule == "text":
 							values[i] = lorem.Paragraph(2, 5)
-						case "uniqword":
+						case rule == "uniqword":
 							values[i] = anonWord(values[i])
-						case "uniqemail":
+						case rule == "uniqemail":
 							values[i] = anonEmail(values[i])
-						default:
-							if strings.HasPrefix(rule, "set:") {
-								values[i] = strings.TrimPrefix(rule, "set:")
-							}
+						case rule == "uuids" && !config.EncryptUUIDs:
+							values[i] = anonAllUUIDs(values[i])
+						case strings.HasPrefix(rule, "set:"):
+							values[i] = strings.TrimPrefix(rule, "set:")
 						}
 					}
 				}

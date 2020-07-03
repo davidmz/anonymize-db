@@ -16,49 +16,41 @@ import (
 // Matches only lowercase V4 uuids
 var uuid4Re = regexp.MustCompile("[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}")
 
-func anonUUIDs(str string) string {
-	return uuid4Re.ReplaceAllStringFunc(str, func(uStr string) string {
-		ub, _ := uuid.FromString(uStr)
-		mac := getMacHash()
-		mac.Write(ub.Bytes())
-		u2, _ := uuid.FromBytes(mac.Sum(nil)[:16])
-		u2.SetVersion(uuid.V4)
-		u2.SetVariant(uuid.VariantRFC4122)
-		return u2.String()
-	})
+func anonUUID(str string) string {
+	ub, _ := uuid.FromString(str)
+	mac := getMacHash()
+	mac.Write(ub.Bytes())
+	u2, _ := uuid.FromBytes(mac.Sum(nil)[:16])
+	u2.SetVersion(uuid.V4)
+	u2.SetVariant(uuid.VariantRFC4122)
+	return u2.String()
 }
 
-var wordsMap = make(map[string]string)
-
-func anonWord(str string) string {
-	if w, ok := wordsMap[str]; ok {
-		return w
-	}
-	for {
-		w := lorem.Word(5, 12)
-		if !createdStrings[w] {
-			createdStrings[w] = true
-			wordsMap[str] = w
-			return w
-		}
-	}
+func anonAllUUIDs(str string) string {
+	return uuid4Re.ReplaceAllStringFunc(str, anonUUID)
 }
 
-func anonEmail(str string) string {
-	if w, ok := wordsMap[str]; ok {
-		return w
-	}
-	for {
-		w := lorem.Email()
-		if !createdStrings[w] {
-			createdStrings[w] = true
-			wordsMap[str] = w
-			return w
-		}
-	}
-}
+var anonWord = anonUniqString(func() string { return lorem.Word(5, 12) })
+var anonEmail = anonUniqString(func() string { return lorem.Email() })
 
 var createdStrings = make(map[string]bool)
+var wordsMap = make(map[string]string)
+
+func anonUniqString(gen func() string) func(string) string {
+	return func(str string) string {
+		if w, ok := wordsMap[str]; ok {
+			return w
+		}
+		for {
+			w := gen()
+			if !createdStrings[w] {
+				createdStrings[w] = true
+				wordsMap[str] = w
+				return w
+			}
+		}
+	}
+}
 
 var _macHash hash.Hash
 
