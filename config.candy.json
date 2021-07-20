@@ -82,6 +82,12 @@
                 "private_meta": "set:\\N",
                 "preferences": "set:{}"
             }
+        },
+        "public.jobs": {
+          "clean": true
+        },
+        "public.auth_sessions": {
+          "clean": true
         }
     }
 }

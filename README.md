@@ -83,7 +83,7 @@ Only non-NULL and non-empty columns processed.
 ### Provided configurations
 
 The provided configs are compatible with FreeFeed DB scheme with 
-the last migration `20200422122956_multi_homefeeds.js`.
+the last migration `20210224194435_comment_numbers.js`.
 
 The `hashed_password` value in the `public.users` table ([config.anon.json](./config.anon.json)) is
 a hashed 'tester' string (so all users in resulted database will have the same 'tester' password).

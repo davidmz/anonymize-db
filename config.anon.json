@@ -93,8 +93,16 @@
                 "reset_password_expires_at": "set:\\N",
                 "frontend_preferences": "set:\\N",
                 "private_meta": "set:\\N",
-                "preferences": "set:{}"
+                "preferences": "set:{}",
+                "gone_status": "set:\\N",
+                "gone_at": "set:\\N"
             }
+        },
+        "public.jobs": {
+          "clean": true
+        },
+        "public.auth_sessions": {
+          "clean": true
         }
     }
 }
