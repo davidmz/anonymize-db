@@ -20,7 +20,9 @@ func processTable(headerLine string, scanner *bufio.Scanner) {
 
 	header := headerLineRe.FindStringSubmatch(headerLine)
 	mustbe.True(header != nil, fmt.Errorf("invalid COPY line: %s", headerLine))
+	//lint:ignore SA5011 we are sure that header is not nil, see prev. line
 	table := header[1]
+	//lint:ignore SA5011 we are sure that header is not nil here too
 	columns := strings.Split(header[2], ", ")
 	log.Println("Table found:", table, columns)
 

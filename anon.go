@@ -7,6 +7,8 @@ import (
 	"hash"
 	"io"
 	"regexp"
+	"strconv"
+	"strings"
 
 	lorem "github.com/drhodes/golorem"
 
@@ -41,8 +43,9 @@ func anonUniqString(gen func() string) func(string) string {
 		if w, ok := wordsMap[str]; ok {
 			return w
 		}
-		for {
-			w := gen()
+
+		for i := 0; ; i++ {
+			w := numExtend(gen(), i)
 			if !createdStrings[w] {
 				createdStrings[w] = true
 				wordsMap[str] = w
@@ -63,4 +66,18 @@ func getMacHash() hash.Hash {
 		_macHash.Reset()
 	}
 	return _macHash
+}
+
+func numExtend(str string, num int) string {
+	const mod = 10
+	if num < mod {
+		return str
+	}
+	num /= mod
+	idx := strings.LastIndex(str, ".")
+	if idx >= 0 {
+		return str[:idx] + strconv.Itoa(num) + str[idx:]
+	} else {
+		return str + strconv.Itoa(num)
+	}
 }
