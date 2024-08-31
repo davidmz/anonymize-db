@@ -38,7 +38,8 @@
         "public.comments": {
             "columns": {
                 "body": "text",
-                "body_tsvector": "set:\\N"
+                "body_tsvector": "set:\\N",
+                "short_id": "shortid"
             }
         },
         "public.external_auth": {
@@ -95,7 +96,8 @@
                 "private_meta": "set:\\N",
                 "preferences": "set:{}",
                 "gone_status": "set:\\N",
-                "gone_at": "set:\\N"
+                "gone_at": "set:\\N",
+                "sys_preferences": "set:\\N"
             }
         },
         "public.jobs": {
@@ -103,6 +105,29 @@
         },
         "public.auth_sessions": {
           "clean": true
+        },
+        "public.attachments_sanitize_task": {
+          "clean": true
+        },
+        "public.email_verification_codes": {
+          "clean": true
+        },
+        "public.frozen_users": {
+          "clean": true
+        },
+        "public.admin_users_roles": {
+          "clean": true
+        },
+        "public.admin_actions": {
+          "clean": true
+        },
+        "public.translation_usage": {
+          "clean": true
+        },
+        "public.post_short_ids": {
+          "columns": {
+            "short_id": "shortid"
+          }
         }
     }
 }

@@ -34,6 +34,7 @@ func anonAllUUIDs(str string) string {
 
 var anonWord = anonUniqString(func() string { return lorem.Word(5, 12) })
 var anonEmail = anonUniqString(func() string { return lorem.Email() })
+var anonShortId = anonUniqString(func() string { return shortId(8) })
 
 var createdStrings = make(map[string]bool)
 var wordsMap = make(map[string]string)
@@ -80,4 +81,9 @@ func numExtend(str string, num int) string {
 	} else {
 		return str + strconv.Itoa(num)
 	}
+}
+
+func shortId(length int) string {
+	id, _ := uuid.NewV4()
+	return id.String()[:length]
 }

@@ -84,6 +84,8 @@ func processTable(headerLine string, scanner *bufio.Scanner) {
 							values[i] = anonWord(values[i])
 						case rule == "uniqemail":
 							values[i] = anonEmail(values[i])
+						case rule == "shortid":
+							values[i] = anonShortId(values[i])
 						case rule == "uuids" && !config.EncryptUUIDs:
 							values[i] = anonAllUUIDs(values[i])
 						case strings.HasPrefix(rule, "set:"):

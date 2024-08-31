@@ -71,7 +71,10 @@ The per-column rules are:
 * `uniqword` — unique words like usernames (the same username always converted
   to the same word);
 * `uniqemail` — unique email addresses;
-* `uuids` — encrypt any UUIDs in column (if the global `encryptUUIDs` parameter isn't set);
+* `shortid` — unique 8-characters hexadecimal IDs (the same source always
+  converted to the same short ID);
+* `uuids` — encrypt any UUIDs in column (if the global `encryptUUIDs` parameter
+  isn't set);
 * `set:VALUE` — constant value to write to the column.
 
 The `set:` value format is the same as the 
@@ -83,7 +86,7 @@ Only non-NULL and non-empty columns processed.
 ### Provided configurations
 
 The provided configs are compatible with FreeFeed DB scheme with 
-the last migration `20210224194435_comment_numbers.js`.
+the last migration `20240831105941_attachments_ext_index.ts`.
 
 The `hashed_password` value in the `public.users` table ([config.anon.json](./config.anon.json)) is
 a hashed 'tester' string (so all users in resulted database will have the same 'tester' password).
